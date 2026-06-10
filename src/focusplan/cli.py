@@ -213,6 +213,41 @@ def export_tasks(args: argparse.Namespace) -> int:
     return 0
 
 
+def summarize_tasks(args: argparse.Namespace) -> int:
+    tasks = load_tasks()
+    today = date.today()
+    open_tasks = [task for task in tasks if not task.done]
+    completed_tasks = [task for task in tasks if task.done]
+    due_today = [
+        task
+        for task in open_tasks
+        if task.due is not None and date.fromisoformat(task.due) == today
+    ]
+    overdue = [
+        task
+        for task in open_tasks
+        if task.due is not None and date.fromisoformat(task.due) < today
+    ]
+    total_minutes = sum(task.minutes for task in open_tasks)
+
+    print(f"Open tasks: {len(open_tasks)}")
+    print(f"Completed tasks: {len(completed_tasks)}")
+    print(f"Due today: {len(due_today)}")
+    print(f"Overdue: {len(overdue)}")
+    print(f"Open estimate: {total_minutes} min")
+
+    if args.by_priority:
+        print("By priority:")
+        for priority in sorted(PRIORITY_ORDER, key=PRIORITY_ORDER.get):
+            priority_tasks = [
+                task for task in open_tasks if task.priority == priority
+            ]
+            priority_minutes = sum(task.minutes for task in priority_tasks)
+            print(f"  {priority}: {len(priority_tasks)} tasks, {priority_minutes} min")
+
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="focusplan",
@@ -252,6 +287,14 @@ def build_parser() -> argparse.ArgumentParser:
     export = subparsers.add_parser("export", help="export tasks as CSV")
     export.add_argument("--output", help="write CSV to this file")
     export.set_defaults(func=export_tasks)
+
+    summary = subparsers.add_parser("summary", help="summarize current workload")
+    summary.add_argument(
+        "--by-priority",
+        action="store_true",
+        help="show open task counts and minutes by priority",
+    )
+    summary.set_defaults(func=summarize_tasks)
 
     return parser
 

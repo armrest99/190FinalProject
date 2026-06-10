@@ -115,6 +115,47 @@ def test_export_quotes_csv_fields(tmp_path, monkeypatch, capsys):
     assert "school reading" in output
 
 
+def test_summary_reports_workload_by_priority(tmp_path, monkeypatch, capsys):
+    db = tmp_path / "tasks.json"
+    monkeypatch.setenv("FOCUSPLAN_DB", str(db))
+    db.write_text(
+        json.dumps(
+            [
+                {
+                    "id": 1,
+                    "title": "High priority task",
+                    "due": "2026-06-11",
+                    "priority": "high",
+                    "minutes": 45,
+                    "tags": [],
+                    "done": False,
+                    "created_at": "",
+                    "completed_at": None,
+                },
+                {
+                    "id": 2,
+                    "title": "Completed task",
+                    "due": "2026-06-10",
+                    "priority": "medium",
+                    "minutes": 30,
+                    "tags": [],
+                    "done": True,
+                    "created_at": "",
+                    "completed_at": "2026-06-10T12:00:00",
+                },
+            ]
+        )
+    )
+
+    assert cli.main(["summary", "--by-priority"]) == 0
+
+    output = capsys.readouterr().out
+    assert "Open tasks: 1" in output
+    assert "Completed tasks: 1" in output
+    assert "Open estimate: 45 min" in output
+    assert "high: 1 tasks, 45 min" in output
+
+
 def test_positive_int_rejects_non_positive_values():
     try:
         cli.positive_int("0")

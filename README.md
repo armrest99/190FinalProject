@@ -37,6 +37,12 @@ Generate a plan for the time you have available:
 focusplan plan --minutes 120
 ```
 
+Summarize your current workload:
+
+```bash
+focusplan summary --by-priority
+```
+
 Complete or remove tasks by ID:
 
 ```bash
