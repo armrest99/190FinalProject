@@ -3,7 +3,7 @@ name = "focusplan"
 version = "0.1.0"
 description = "A command-line planner for prioritizing student tasks."
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.8"
 authors = [{ name = "DSC 190 Student" }]
 dependencies = []
 
@@ -16,12 +16,12 @@ build-backend = "hatchling.build"
 
 [tool.ruff]
 line-length = 88
-target-version = "py310"
+target-version = "py38"
 
 [tool.pytest.ini_options]
 pythonpath = ["src"]
 
 [dependency-groups]
 dev = [
-    "pytest>=9.0.3",
+    "pytest>=7.4,<9",
 ]

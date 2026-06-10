@@ -8,7 +8,7 @@ import sys
 from dataclasses import asdict, dataclass
 from datetime import date, datetime, timedelta
 from pathlib import Path
-from typing import Any
+from typing import Any, Dict, List, Optional, Tuple
 
 
 PRIORITY_ORDER = {"high": 0, "medium": 1, "low": 2}
@@ -19,16 +19,16 @@ DEFAULT_DB = Path.home() / ".local" / "share" / "focusplan" / "tasks.json"
 class Task:
     id: int
     title: str
-    due: str | None = None
+    due: Optional[str] = None
     priority: str = "medium"
     minutes: int = 30
-    tags: list[str] | None = None
+    tags: Optional[List[str]] = None
     done: bool = False
     created_at: str = ""
-    completed_at: str | None = None
+    completed_at: Optional[str] = None
 
     @classmethod
-    def from_dict(cls, raw: dict[str, Any]) -> "Task":
+    def from_dict(cls, raw: Dict[str, Any]) -> "Task":
         return cls(
             id=int(raw["id"]),
             title=str(raw["title"]),
@@ -46,7 +46,7 @@ def db_path() -> Path:
     return Path(os.environ.get("FOCUSPLAN_DB", DEFAULT_DB)).expanduser()
 
 
-def load_tasks(path: Path | None = None) -> list[Task]:
+def load_tasks(path: Optional[Path] = None) -> List[Task]:
     path = path or db_path()
     if not path.exists():
         return []
@@ -57,13 +57,13 @@ def load_tasks(path: Path | None = None) -> list[Task]:
     return [Task.from_dict(item) for item in raw]
 
 
-def save_tasks(tasks: list[Task], path: Path | None = None) -> None:
+def save_tasks(tasks: List[Task], path: Optional[Path] = None) -> None:
     path = path or db_path()
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps([asdict(task) for task in tasks], indent=2) + "\n")
 
 
-def parse_due(value: str | None) -> str | None:
+def parse_due(value: Optional[str]) -> Optional[str]:
     if value is None:
         return None
     normalized = value.strip().lower()
@@ -79,11 +79,11 @@ def parse_due(value: str | None) -> str | None:
         ) from error
 
 
-def next_id(tasks: list[Task]) -> int:
+def next_id(tasks: List[Task]) -> int:
     return max((task.id for task in tasks), default=0) + 1
 
 
-def task_sort_key(task: Task) -> tuple[date, int, int, int]:
+def task_sort_key(task: Task) -> Tuple[date, int, int, int]:
     due = date.max if task.due is None else date.fromisoformat(task.due)
     return (due, PRIORITY_ORDER[task.priority], task.minutes, task.id)
 
@@ -155,7 +155,7 @@ def remove_task(args: argparse.Namespace) -> int:
 def plan_tasks(args: argparse.Namespace) -> int:
     open_tasks = [task for task in load_tasks() if not task.done]
     candidates = sorted(open_tasks, key=task_sort_key)
-    chosen: list[Task] = []
+    chosen: List[Task] = []
     remaining = args.minutes
 
     for task in candidates:
@@ -309,7 +309,7 @@ def positive_int(value: str) -> int:
     return parsed
 
 
-def main(argv: list[str] | None = None) -> int:
+def main(argv: Optional[List[str]] = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
     return args.func(args)
