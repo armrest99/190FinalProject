@@ -15,51 +15,51 @@ Install from GitHub with `uv`:
 uv add "git+https://github.com/armrest99/190FinalProject.git"
 ```
 
-After installation, run the `focusplan` command.
+After installation, run commands through `uv run focusplan`.
 
 Add tasks:
 
 ```bash
-focusplan add "Finish DSC 190 final project" --due today --priority high --minutes 90 --tag school
-focusplan add "Review lecture notes" --due 2026-06-11 --priority medium --minutes 45 --tag studying
-focusplan add "Submit repo_url.txt" --due tomorrow --priority high --minutes 10 --tag school
+uv run focusplan add "Finish DSC 190 final project" --due today --priority high --minutes 90 --tag school
+uv run focusplan add "Review lecture notes" --due 2026-06-11 --priority medium --minutes 45 --tag studying
+uv run focusplan add "Submit repo_url.txt" --due tomorrow --priority high --minutes 10 --tag school
 ```
 
 List open tasks:
 
 ```bash
-focusplan list
+uv run focusplan list
 ```
 
 Generate a plan for the time you have available:
 
 ```bash
-focusplan plan --minutes 120
+uv run focusplan plan --minutes 120
 ```
 
 Summarize your current workload:
 
 ```bash
-focusplan summary --by-priority
+uv run focusplan summary --by-priority
 ```
 
 Complete or remove tasks by ID:
 
 ```bash
-focusplan done 1
-focusplan remove 2
+uv run focusplan done 1
+uv run focusplan remove 2
 ```
 
 Show completed tasks too:
 
 ```bash
-focusplan list --all
+uv run focusplan list --all
 ```
 
 Export your task history to CSV:
 
 ```bash
-focusplan export --output tasks.csv
+uv run focusplan export --output tasks.csv
 ```
 
 By default, FocusPlan stores data at
@@ -67,7 +67,7 @@ By default, FocusPlan stores data at
 `FOCUSPLAN_DB` to another path:
 
 ```bash
-FOCUSPLAN_DB=/tmp/my-tasks.json focusplan add "Try FocusPlan"
+FOCUSPLAN_DB=/tmp/my-tasks.json uv run focusplan add "Try FocusPlan"
 ```
 
 For development, run the test suite with:
