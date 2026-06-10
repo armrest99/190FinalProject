@@ -103,7 +103,7 @@ def add_task(args: argparse.Namespace) -> int:
     task = Task(
         id=next_id(tasks),
         title=args.title,
-        due=parse_due(args.due),
+        due=args.due,
         priority=args.priority,
         minutes=args.minutes,
         tags=args.tag,

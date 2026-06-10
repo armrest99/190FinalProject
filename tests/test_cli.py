@@ -57,6 +57,17 @@ def test_plan_prioritizes_due_date_and_priority(tmp_path, monkeypatch, capsys):
     assert "Later low priority" not in output
 
 
+def test_add_accepts_iso_due_date(tmp_path, monkeypatch, capsys):
+    db = tmp_path / "tasks.json"
+    monkeypatch.setenv("FOCUSPLAN_DB", str(db))
+
+    assert cli.main(["add", "Turn in repo URL", "--due", "2026-06-11"]) == 0
+
+    saved = json.loads(db.read_text())
+    assert saved[0]["due"] == "2026-06-11"
+    assert "Added task 1" in capsys.readouterr().out
+
+
 def test_done_and_remove_update_task_file(tmp_path, monkeypatch, capsys):
     db = tmp_path / "tasks.json"
     monkeypatch.setenv("FOCUSPLAN_DB", str(db))
@@ -102,3 +113,12 @@ def test_export_quotes_csv_fields(tmp_path, monkeypatch, capsys):
     assert "id,title,due,priority,minutes,tags,done,created_at,completed_at" in output
     assert '"Read chapter 1, section 2"' in output
     assert "school reading" in output
+
+
+def test_positive_int_rejects_non_positive_values():
+    try:
+        cli.positive_int("0")
+    except Exception as error:
+        assert "greater than zero" in str(error)
+    else:
+        raise AssertionError("positive_int accepted zero")
